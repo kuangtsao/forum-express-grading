@@ -120,6 +120,18 @@ const adminController = {
         res.redirect('/admin/users')
       })
       .catch(err => next(err))
+  },
+  getCategories: (req, res, next) => {
+    console.log('getCategories')
+  },
+  postCategories: (req, res, next) => {
+    console.log('postCategories')
+  },
+  putCategories: (req, res, next) => {
+    console.log('putCategories')
+  },
+  deleteCategories: (req, res, next) => {
+    console.log('deleteCategories')
   }
 }
 
