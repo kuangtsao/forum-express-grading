@@ -122,11 +122,13 @@ const adminController = {
       .catch(err => next(err))
   },
   getCategories: (req, res, next) => {
-    return Category.findAll({
-      raw: true
-    })
-      .then(categories => {
-        res.render('admin/categories', { categories })
+    return Promise.all([
+      Category.findAll({ raw: true }),
+      req.params.id ? Category.findByPk(req.params.id, { raw: true }) : null
+    ])
+      .then(([categories, category]) => {
+        console.log(category)
+        res.render('admin/categories', { categories, category })
       })
       .catch(err => next(err))
   },
@@ -144,7 +146,16 @@ const adminController = {
       .catch(err => next(err))
   },
   putCategories: (req, res, next) => {
-    console.log('putCategories')
+    const { name } = req.body
+    return Category.findByPk(req.params.id)
+      .then(category => {
+        category.update({ name })
+      })
+      .then(() => {
+        req.flash('success_messages', 'category was successfully to update')
+        res.redirect('/admin/categories')
+      })
+      .catch(err => next(err))
   },
   deleteCategories: (req, res, next) => {
     console.log('deleteCategories')
