@@ -131,7 +131,17 @@ const adminController = {
       .catch(err => next(err))
   },
   postCategories: (req, res, next) => {
-    console.log('postCategories')
+    const { name } = req.body
+    console.log(name)
+    if (!name) throw new Error('category name is required!')
+
+    return Category.create({
+      name
+    }).then(() => {
+      req.flash('success_messages', 'category was successfully created')
+      res.redirect('/admin/categories')
+    })
+      .catch(err => next(err))
   },
   putCategories: (req, res, next) => {
     console.log('putCategories')
