@@ -122,7 +122,13 @@ const adminController = {
       .catch(err => next(err))
   },
   getCategories: (req, res, next) => {
-    console.log('getCategories')
+    return Category.findAll({
+      raw: true
+    })
+      .then(categories => {
+        res.render('admin/categories', { categories })
+      })
+      .catch(err => next(err))
   },
   postCategories: (req, res, next) => {
     console.log('postCategories')
