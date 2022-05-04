@@ -41,6 +41,7 @@ const userController = {
     res.redirect('/signin')
   },
   getUser: (req, res, next) => {
+    // TODO: profile 會有 header 顯示非當前 user 的 email 問題，之後修
     return User.findByPk(
       req.params.id, {
         include: [
@@ -52,22 +53,28 @@ const userController = {
         if (!user) throw new Error("User didn't exist!")
         res.render('users/profile', { user: user.toJSON() })
       })
+      .catch(err => next(err))
   },
   editUser: (req, res, next) => {
-    if (getUser(req).id !== Number(req.params.id)) {
+    const userId = getUser(req).id
+
+    if (userId !== Number(req.params.id)) {
       req.flash('error_messages', '只能改自己的資料！')
-      res.redirect(`/users/${req.user.id}/edit`)
+      return res.redirect(`/users/${userId}/edit`)
     }
-    return User.findByPk(req.params.id, { raw: true })
-      .then(user => {
-        if (!user) throw new Error("User didn't exist!")
-        res.render('users/edit', { user })
-      })
+    return User.findByPk(userId, { raw: true })
+      .then(user => res.render('users/edit', { user }))
+      .catch(err => next(err))
   },
   putUser: (req, res, next) => {
     const { name } = req.body
     const { file } = req
     const { id } = req.params
+
+    if (getUser(req).id !== Number(req.params.id)) {
+      req.flash('error_messages', '只能改自己的資料！')
+      return res.redirect(`/users/${req.user.id}/edit`)
+    }
 
     if (!name) throw new Error('User name is required!')
 
