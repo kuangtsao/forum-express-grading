@@ -23,8 +23,8 @@ const restaurantController = {
       Category.findAll({ raw: true })
     ])
       .then(([restaurants, categories]) => {
-        const favoritedRestaurantsId = req.user && req.user.FavoritedRestaurants.map(fr => fr.id)
-        const likedRestaurantsId = req.user && req.user.LikedRestaurants.map(l => l.id)
+        const favoritedRestaurantsId = req.user?.FavoritedRestaurants ? req.user.FavoritedRestaurants.map(fr => fr.id) : []
+        const likedRestaurantsId = req.user?.LikedRestaurants ? req.user.LikedRestaurants.map(l => l.id) : []
         const data = restaurants.rows.map(r => ({
           ...r,
           description: r.description.substring(0, 50),
