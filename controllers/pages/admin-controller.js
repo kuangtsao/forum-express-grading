@@ -1,6 +1,7 @@
 // controller 是一種 object
 const { Restaurant, User, Category } = require('../../models')
 const { imgurFileHandler } = require('../../helpers/file-helpers')
+const adminServices = require('../../services/admin-services')
 
 const adminController = {
   getRestaurants: (req, res, next) => {
@@ -88,13 +89,7 @@ const adminController = {
       .catch(err => next(err))
   },
   deleteRestaurant: (req, res, next) => {
-    return Restaurant.findByPk(req.params.id)
-      .then(restaurant => {
-        if (!restaurant) throw new Error("Restaurant didn't exist!")
-        return restaurant.destroy()
-      })
-      .then(() => res.redirect('/admin/restaurants'))
-      .catch(err => next(err))
+    adminServices.deleteRestaurant(req, (err, data) => err ? next(err) : res.redirect('/admin/restaurants', data))
   },
   getUsers: (req, res, next) => {
     return User.findAll({
