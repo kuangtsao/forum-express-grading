@@ -1,46 +1,11 @@
 const { Restaurant, Category, Comment, User } = require('../../models')
-const { getOffset, getPagination } = require('../../helpers/pagination-helper')
+const restaurantServices = require('../../services/restaurant-services')
 const { getUser } = require('../../helpers/auth-helpers')
 
 const restaurantController = {
   // 首頁
   getRestaurants: (req, res, next) => {
-    const DEFAULT_LIMIT = 9
-    const categoryId = Number(req.query.categoryId) || ''
-    const page = Number(req.query.page) || 1
-    const limit = Number(req.query.limit) || DEFAULT_LIMIT
-    const offset = getOffset(limit, page)
-
-    return Promise.all([
-      Restaurant.findAndCountAll({
-        include: Category,
-        where: {
-          ...categoryId ? { categoryId } : {}
-        },
-        limit,
-        offset,
-        raw: true,
-        nest: true
-      }),
-      Category.findAll({ raw: true })
-    ])
-      .then(([restaurants, categories]) => {
-        const favoritedRestaurantsId = req.user && req.user.FavoritedRestaurants.map(fr => fr.id)
-        const likedRestaurantsId = req.user && req.user.LikedRestaurants.map(l => l.id)
-        const data = restaurants.rows.map(r => ({
-          ...r,
-          description: r.description.substring(0, 50),
-          isFavorited: favoritedRestaurantsId.includes(r.id),
-          isLiked: likedRestaurantsId.includes(r.id)
-        }))
-        return res.render('restaurants', {
-          restaurants: data,
-          categories,
-          categoryId,
-          pagination: getPagination(limit, page, restaurants.count)
-        })
-      })
-      .catch(err => next(err))
+    restaurantServices.getRestaurants(req, (err, data) => err ? next : res.render('restaurants', data))
   },
   // 餐廳各自的詳細資料
   getRestaurant: (req, res, next) => {
