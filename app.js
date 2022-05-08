@@ -24,6 +24,7 @@ app.set('view engine', 'hbs')
 
 // body-parser
 app.use(express.urlencoded({ extended: true }))
+app.use(express.json())
 
 app.use(session({ secret: SESSION_SECRET, resave: false, saveUninitialized: false }))
 // 初始化 passport 功能
